@@ -52,3 +52,126 @@ In summary, the Blink Board represents a significant advancement in automation t
 
 ![analog board](https://github.com/blinky-iot/Blink-board/blob/main/images/analog%20board.jpg?raw=true)
 
+
+ ![Power connection](https://github.com/blinky-iot/Blink-board/blob/main/images/power%20connection.jpeg?raw=true)
+
+_+ve wire to go to the +24V mark and -ve wire to be connected to the GND mark._
+
+The recommended input voltage range is 5V-24V
+Led D58 and D59 on the main board will come on to indicate the board is getting 4.2V and 3.3V respectively.
+Flash firmware to the main board via FT232RL FTDI USB To TTL Module.
+
+![Ftdi -> main board](https://github.com/blinky-iot/Blink-board/blob/main/images/FTDI%20usb%20ttl%20J17%20main%20board.jpg?raw=true)
+
+The FTDI should be connected via jumper wires to the male header pins labeled J26 on the main board as shown in the image above. Match the labels on the connector J26 to those on the FTDI as follows
+<table>
+  <tr>
+    <th>J26</th>
+    <th>FTDI</th>
+  </tr>
+  <tr>
+    <td>RTS</td>
+    <td>RTS</td>
+  </tr>
+  <tr>
+    <td>DTR</td>
+    <td>DTR</td>
+  </tr>
+  <tr>
+    <td>TXD</td>
+    <td>RXD</td>
+  </tr>
+  <tr>
+    <td>RXD</td>
+    <td>TXD</td>
+  </tr>
+  <tr>
+    <td>GND</td>
+    <td>GND</td>
+  </tr>
+</table>
+
+**NB:** For any connection on the board make sure the terminal block is fully opened before inserting the wire as shown below
+
+![proper wire connection](https://github.com/blinky-iot/Blink-board/blob/main/images/proper%20wire%20connection.jpg?raw=true)
+
+## Main board -> Extension board
+Using the provided cable illustrated in the image below, connect the extension board to the Main board.
+
+![jst connector](https://github.com/blinky-iot/Blink-board/blob/main/images/wire%20loom%20connector.jpg?raw=true)
+
+One end of the connector should connect to the JST connector J29(extension board) and the other JST connector on J19(main board)
+
+
+## Main board -> GSM
+Connect the SIM800C GSM module to the J8 connector on the main board.
+When the board is powered the status LED on the GSM module will come on.
+The NETLIGHT will blink based on the table below
+<table>
+  <tr>
+    <th>Status</th>
+    <th>SIM800C Behavior</th>
+  </tr>
+  <tr>
+    <td>64ms On/ 800ms Off</td>
+    <td>Not registered to the network</td>
+  </tr>
+  <tr>
+    <td>64ms On/ 3000ms Off</td>
+    <td>Registered to the network</td>
+  </tr>
+  <tr>
+    <td>64ms On/ 300ms Off</td>
+    <td>GPRS communication is established</td>
+  </tr>
+</table>
+NB:Please take note of the orientation as shown in the image below
+
+![sim800 main board](https://github.com/blinky-iot/Blink-board/blob/main/images/sim800%20mainboard.jpeg?raw=true)
+
+## Main board -> Ethernet
+Connect the ethernet module to connector J10 as shown in the Image below
+
+![Ethernet main board](https://github.com/blinky-iot/Blink-board/blob/main/images/Ethernet%20main%20board.jpeg?raw=true)
+
+The module that works well with the Blink board is the W5500 Ethernet Shield LAN Network shown here below:
+
+![Ethernet module](https://github.com/blinky-iot/Blink-board/blob/main/images/Ethernet%20module.jpg?raw=true)
+
+## Main board -> RS485
+RS485 can be connected to either connector J25 or J23
+In the case shown in the image below the RS485 is connected to connector J23.
+Once connector J23 is in use, the user has to communicate to the module via software serial as illustrated in the firmware examples provided.
+
+![RS485 main board](https://github.com/blinky-iot/Blink-board/blob/main/images/RS485%20main%20board.jpeg?raw=true)
+
+## Main board -> RS232
+RS232 can be connected to either connector J25 or J23
+In the case shown in the image below the RS232 is connected to J25.
+Connector J25 uses UART1 which is the same debugging port used to flash the firmware onto the Blink board.
+
+![RS232 main board](https://github.com/blinky-iot/Blink-board/blob/main/images/RS232%20main%20board.jpeg?raw=true)
+
+To avoid interruption while uploading firmware to the board using the provided jumpers, disconnect them from connector J27 as shown below.
+
+![J27 jumper removal](https://github.com/blinky-iot/Blink-board/blob/main/images/J27%20jumper%20remove.jpg?raw=true)
+
+## Main board -> Analog board
+With the analog board that is provided connect it to j9 connector(10 pi straight male header pin).
+While connecting the analog board take note of the orientation as indicated in the image below
+The analog board has 8 analog inputs labelled AI_1 ->AI_8, there is source voltage of 10V labled GND and +10V. The 10V source can be used with various sensor applications for example a simple potential divider to vary the speed of a motor
+Analog sensor is governed by the equations below:
+1. analog value=(1023 * Known voltage)/10
+1. Voltage=(10 * Analog value)/1023 
+
+The equation above can be used when working under different conditions of your code
+
+![Analog board main board](https://github.com/blinky-iot/Blink-board/blob/main/images/Main%20board%20-%20Analog%20board.jpeg?raw=true)
+
+## Main board ->I/O
+### INPUT
+
+![INPUT](https://github.com/blinky-iot/Blink-board/blob/main/images/input%20main%20board.jpg?raw=true)
+### OUTPUT
+
+![OUTPUT](https://github.com/blinky-iot/Blink-board/blob/main/images/output%20main%20board.jpg?raw=true)
