@@ -13,23 +13,28 @@ class Blink {
 		Blink(SPIClass &spi = SPI, TwoWire &wire = Wire);//, TwoWire *wire = &Wire);
     ~Blink();
 		void begin();
+    void gsm_begin();
+    bool isConnected();
+    char* wirescan();
 		uint16_t analogRead(uint8_t channel);
     void boardcount(int board);
-    void writeDigital(int bitnum, bool value);
+    void writeDigital(int pin, bool value);
     void writeDigital(int pin, int board,bool value);
     void pwm_start(uint32_t frequency);
     void set_pwm(int pin,unsigned int value);
-    // void digitalWrite(uint8_t pinnum, bool val);
+    bool digitalRead(uint8_t pin,uint8_t addr);
     bool digitalRead(uint8_t pin);
-    bool isConnected();
 
 	private:
 		SPIClass *spi;
     TwoWire *wire;
-    hw_timer_t *timer = NULL;
+    // hw_timer_t *timer = NULL;
 
 		uint8_t cs =27;
     uint8_t ss =5;
+    uint8_t Ethernet_cs = 2;
+    uint8_t Ethernet_rst = 4;
+    uint8_t Sim_pwrkey = 33;
     static const int spiClk = 1000000;  // 1 MHz
     /*time between the end of the sample
     period and the time that all 12 data bits have been
@@ -40,8 +45,9 @@ class Blink {
     int bitCount;
     int byteCount;
     byte writeBuffer[16];
+    char _address[255];
     void writebyte();
-    void InitTimer(uint32_t frequency);
+    // void InitTimer(uint32_t frequency);
   public:
     unsigned char * m_PWMValues;
 	};

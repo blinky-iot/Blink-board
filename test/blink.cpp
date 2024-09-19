@@ -1,38 +1,34 @@
-#include "HardwareSerial.h"
-#include "Arduino.h"
-#include <stdint.h>
-#include <stdio.h>
-#include "HardwareSerial.h"
-// #include "WString.h"
-// #include <stdint.h>
-#include "Wire.h"
+#include "esp32-hal-gpio.h"
 #include "blink.h"
 
-Blink::Blink(SPIClass &spi,TwoWire &wire) {
-  this->spi = &spi;
-  this->wire = &wire;
-  this->wire->begin();
-	unsigned char * m_PWMValues=nullptr;
+#define DEBUG_PRINT 0  // Set to 1 to enable debug prints, 0 to disable
+#define USE_GSM true
+
+Blink::Blink(SPIClass &spi, TwoWire &wire) {
+    this->spi = &spi;
+    this->spi->begin();
+    this->wire = &wire;
+    this->wire->begin(); 
+    m_PWMValues = nullptr;
 }
 
-Blink::~Blink(){
-  // if(m_PWMValues > 0){
-  //   free(m_PWMValues);
-  // }
+Blink::~Blink() {
+    if (m_PWMValues != nullptr) {
+        free(m_PWMValues);
+    }
 }
 
 void Blink::begin() {
-	pinMode(cs, OUTPUT);
-	digitalWrite(cs, HIGH);
-  pinMode(SS,OUTPUT);
-  digitalWrite(SS,HIGH);
-  spi->begin(SCK, MISO, MOSI, -1);
-  wirescan();
-	}
+    pinMode(cs, OUTPUT);
+    digitalWrite(cs, HIGH);
+    pinMode(SS, OUTPUT);
+    digitalWrite(SS, HIGH);
+    #if USE_GSM
+    pinMode(Sim_pwrkey, OUTPUT);
+    #endif
+}
 
 void Blink::gsm_begin() {
-  pinMode(Sim_pwrkey, OUTPUT);
-  
   unsigned long startTime = millis();
   const unsigned long pulseDuration = 100;
   
@@ -53,47 +49,6 @@ void Blink::gsm_begin() {
   Serial2.write("AT+IPR=9600\r\n");
   Serial2.end();
   Serial2.begin(9600);
-}
-
-uint16_t Blink::analogRead(uint8_t channel) {
-  spi->beginTransaction(SPISettings(spianalogClk, MSBFIRST, SPI_MODE0));
-	uint8_t addr = 0b01100000 | ((channel & 0b111) << 2);
-	digitalWrite(cs, LOW);                // Set the chip select pin LOW to start SPI communication
-	spi->transfer(addr);                  // Send the address byte over SPI
-	uint8_t byte1 = spi->transfer(0x00);  // Receive the first byte of data from SPI
-	uint8_t byte2 = spi->transfer(0x00);  // Receive the second byte of data from SPI
-	digitalWrite(cs, HIGH);               //set the chip select pin HIGH to end SPI communication
-  spi->endTransaction();
-  return ((byte1 << 4) | (byte2 >> 4));
-	}
-
- void Blink::boardcount(int board) {
-  this->bitCount = board * 8;
-  this->byteCount = (board * 8)/8;
-  for(int i = 0; i < this->byteCount; i++) {
-    this->writeBuffer[i] = 0;
-  }
-} 
-
-bool Blink::digitalRead(uint8_t pin, uint8_t addr){
-  readbuf = 0;
-  uint8_t received = wire->requestFrom(addr,1);
-  if ((bool)received) {  //If received more than zero bytes
-    wire->readBytes((uint8_t *) &readbuf, received);
-    return(readbuf >> pin) & 0x01;
-  }
-}
-
-bool Blink::digitalRead(uint8_t pin){
-  pin = pin -1;
-  readbuf = 0;
-  uint8_t addr = PCF8574_I2CADDR1_DEFAULT;
-  uint8_t received = wire->requestFrom(addr,1);
-  if ((bool)received) {  //If received more than zero bytes
-    wire->readBytes((uint8_t *) &readbuf, received);
-    return(readbuf >> pin) & 0x01;
-  }
-  return received;
 }
 
 bool Blink::isConnected(){
@@ -129,6 +84,57 @@ char* Blink::wirescan(){
   return _address;
 }
 
+bool Blink::digitalRead(uint8_t pin, uint8_t addr){
+  readbuf = 0;
+  uint8_t received = wire->requestFrom(addr,1);
+  if ((bool)received) {  //If received more than zero bytes
+    wire->readBytes((uint8_t *) &readbuf, received);
+    return(readbuf >> pin) & 0x01;
+  }
+}
+
+bool Blink::digitalRead(uint8_t pin){
+  // pin = pin -1;
+  readbuf = 0;
+  uint8_t addr = PCF8574_I2CADDR1_DEFAULT;
+  uint8_t received = wire->requestFrom(addr,1);
+  if ((bool)received) {  //If received more than zero bytes
+    wire->readBytes((uint8_t *) &readbuf, received);
+    return(readbuf >> pin) & 0x01;
+  }
+  return received;
+}
+
+uint16_t Blink::analogRead(uint8_t channel) {
+    spi->beginTransaction(SPISettings(spianalogClk, MSBFIRST, SPI_MODE0));
+    uint8_t addr = 0b01100000 | ((channel & 0b111) << 2);
+    digitalWrite(cs, LOW);
+    spi->transfer(addr);
+    uint8_t byte1 = spi->transfer(0x00);
+    uint8_t byte2 = spi->transfer(0x00);
+    digitalWrite(cs, HIGH);
+    spi->endTransaction();
+    uint16_t result = ((byte1 << 4) | (byte2 >> 4));
+
+    #if DEBUG_PRINT
+    Serial.printf("Analog read channel %d: %d\n", channel, result);
+    #endif
+
+    return result;
+}
+
+void Blink::boardcount(int board) {
+    this->bitCount = board * 8;
+    this->byteCount = (board * 8) / 8;
+    for (int i = 0; i < this->byteCount; i++) {
+        this->writeBuffer[i] = 0;
+    }
+
+    #if DEBUG_PRINT
+    Serial.printf("Board count set to %d, byteCount: %d\n", board, this->byteCount);
+    #endif
+}
+
 void Blink::writeDigital(int pin, bool value) {
   if(pin==0)pin=1;
   int bytenum = (pin-1) / 8;
@@ -139,44 +145,44 @@ void Blink::writeDigital(int pin, bool value) {
   writebyte();
 }
 
-void Blink::writeDigital(int pin, int board,bool value) {
-  if(pin==0)pin=1;
-  pin = pin + (board*8);
-  int bytenum = (pin-1) / 8;
-  int offset = (pin-1) % 8;
-  byte b = this->writeBuffer[bytenum];
-  bitWrite(b, offset, value);
-  this->writeBuffer[bytenum] = b;
-  writebyte();
-}
-void Blink::writebyte() {
-  //SPI serial interface (modes 0,0 and 1,1)ref https://ww1.microchip.com/downloads/en/devicedoc/21298e.pdf
-  spi->beginTransaction(SPISettings(spiClk, MSBFIRST, SPI_MODE0));
-  digitalWrite(SS, LOW);
-  spi->transfer(this->writeBuffer, this->byteCount);
-  // for(int i = 0; i < this->byteCount; i++) {
-  //   spi->transfer(this->writeBuffer[i]);
-  //   // delay(50);
-  // }
-  digitalWrite(SS, HIGH);
-  spi->endTransaction();
+void Blink::writeDigital(int pin, int board, bool value) {
+    if (pin == 0) pin = 1;
+    pin = pin + (board * 8);
+    int bytenum = (pin - 1) / 8;
+    int offset = (pin - 1) % 8;
+    // Error: Pin %d on board %d is out of range
+    if (bytenum >= this->byteCount) {
+        return;
+    }
+    
+    byte b = this->writeBuffer[bytenum];
+    bitWrite(b, offset, value);
+    this->writeBuffer[bytenum] = b;
+
+    writebyte();
 }
 
-void Blink::analogWrite(int pin, uint8_t value){
-  if(pin==0)pin=1;
-  int bytenum = (pin-1) / 8;
-  int offset = (pin-1) % 8;
-  int accumulator = 0;
-  byte b = this->writeBuffer[bytenum];
-  for(int i=0; i<max_brightness; i++){
-    bool pinState = (i < value);
-    bitWrite(b, pin, pinState);
+void Blink::writebyte() {
+   //SPI serial interface (modes 0,0 and 1,1)ref https://ww1.microchip.com/downloads/en/devicedoc/21298e.pdf
     spi->beginTransaction(SPISettings(spiClk, MSBFIRST, SPI_MODE0));
     digitalWrite(SS, LOW);
-    spi->transfer(b);
-    // Serial.println(b,BIN);
+    spi->transfer(this->writeBuffer, this->byteCount);
     digitalWrite(SS, HIGH);
+
     spi->endTransaction();
-  }
-  // writebyte();
 }
+
+void IRAM_ATTR onTimer() {
+    // Implement your timer interrupt handler here
+}
+
+// void Blink::InitTimer(uint32_t frequency) {
+//     timer = timerBegin(0, 80, true);  // 80 is prescaler, true for count up
+//     timerAttachInterrupt(timer, &onTimer, true);
+//     timerAlarmWrite(timer, 1000000 / frequency, true);
+//     timerAlarmEnable(timer);
+
+//     #if DEBUG_PRINT
+//     Serial.printf("Timer initialized with frequency %d Hz\n", frequency);
+//     #endif
+// }
