@@ -1,0 +1,75 @@
+site_name: Blink board
+site_url: https://mydomain.org/blinkboard
+theme:
+  name: material
+  language: en
+  features:
+    - search.suggest
+    - navigation.top
+    # - navigation.expand
+    - navigation.instant
+    - navigation.tabs
+    - content.action.edit
+    # - toc.integrate
+  font:
+    text: Merriweather Sans
+    code: Red Hat Mono
+  palette:
+    # Dark Mode
+    - scheme: slate
+      toggle:
+        icon: material/weather-sunny
+        name: Dark mode
+      primary: green
+      accent: deep purple
+
+    # Light Mode
+    - scheme: default
+      toggle:
+        icon: material/weather-night
+        name: Light mode
+      primary: blue
+      accent: deep orange
+plugins: 
+  - search
+markdown_extensions:
+  - admonition
+  - attr_list
+  - pymdownx.highlight
+  - pymdownx.superfences
+  - pymdownx.details
+  - pymdownx.tilde
+  - tables
+extra:
+  social:
+    - icon: fontawesome/brands/instagram
+      link: https://www.instagram.com/blinkelectrics/
+    - icon: fontawesome/brands/youtube
+      link: https://www.youtube.com/@InnovationwithMbari/videos
+    - icon: fontawesome/brands/linkedin
+      link: https://www.linkedin.com/company/blinkelec/posts/?feedView=all
+nav:
+  - Welcome: index.md
+  - Installation:
+    - Getting Started: Installation/Getting started.md
+  - Communication:
+    - Serial : 
+      - RS485 : communication/RS485.md
+      - RS232 : communication/RS232.md
+      - GSM : communication/GSM.md
+    - Ethernet : communication/Ethernet.md
+    - HTTP Request : communication/HTTP Request.md
+  - Input/Output:
+    - Inputs : Input Output/input.md
+    - Outputs : Input Output/output.md
+  - Analog:
+    - ADC : Analog/adc.md
+    - DAC : Analog/dac.md
+  - Advanced:
+    -  Home Assistant Integration: Advance/Home Assistant Integration.md
+    - Filesystem: Advance/Filesystem.md
+    - OTA: Advance/OTA.md
+  - About:
+    - Contributions & Credits: About/Contributions & Credits.md
+    - Privacy Policy: About/Privacy Policy.md
+    - Upcoming Features: About/Upcoming Features.md
