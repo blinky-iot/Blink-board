@@ -1,10 +1,12 @@
-## <div align="center">Blink board 🚨</div>
-<p>
+<p align="center">
  <img width="40%" src="https://github.com/blinky-iot/Blink-board/blob/Resources/images/Main%20board.jpg?raw=true">
- <a href="https://github.com/blinky-iot/Blink-board/releases"><img alt="GitHub Release" src="https://img.shields.io/github/v/release/blinky-iot/Blink-board">
-</a>
-
+ </p><P align="center">
+ <a href="https://github.com/blinky-iot/Blink-board/releases"><img alt="GitHub Release" src="https://img.shields.io/github/v/release/blinky-iot/Blink-board"></a>
+ <a href="https://github.com/blinky-iot/Blink-board/blob/main/LICENSE"><img alt="GitHub License" src="https://img.shields.io/github/license/blinky-iot/Blink-board"></a>
+  
 </p>
+
+# Welcome to Blink board 🚨
 Introducing the Blink Board, a game-changing device designed to bring automation to both homes and industrial settings. This innovative board takes inspiration from PLCs (Programmable Logic Controllers), making it capable of handling a wide range of tasks with ease.
 Powered by the versatile ESP32 microcontroller, the Blink Board offers flexibility for seamless integration into various household appliances for smart home solutions or managing industrial machinery settings.
 
@@ -30,7 +32,7 @@ Pretty much anything else, because Blink board is open source
 
 The blink development board is not only a consumer product, but also designed for anyone who wants to use technology to create and innovate. It is a very simple, interesting and practical tool, you can use it to create the world around you
 
-## Features
+## ⚙️ Features
 * ### Wireless connectivity
 1. Bluetooth: v4.2
 1. Wi-Fi: 802.11 b/g/n
